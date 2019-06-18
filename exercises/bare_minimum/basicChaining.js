@@ -10,11 +10,23 @@
 
 var fs = require('fs');
 var Promise = require('bluebird');
+const promiseConstructor = require('./promiseConstructor');
+const promisification = require('./promisification');
 
-
+const writeFileAsync = Promise.promisify(fs.writeFile);
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
   // TODO
+  return promiseConstructor.pluckFirstLineFromFileAsync(readFilePath)
+    .then((username) => {
+      return promisification.getGitHubProfileAsync(username);
+    })
+    .then((text) => {
+      return writeFileAsync(writeFilePath, JSON.stringify(text));
+    })
+    .catch(() => {
+      console.log('Error in chaining');
+    })
 };
 
 // Export these functions so we can test them
